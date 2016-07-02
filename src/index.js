@@ -1,3 +1,4 @@
+"use strict";
 
 const dat = require("dat-gui");
 
@@ -34,33 +35,43 @@ const
     ],
 
     inputs = {
-        zoom: 25,
-        thickness: 25,
-        aspect: 25,
-        textSize: 25,
-        separation: 55,
-        showLogo: true,
-        reset: function(){
-            inputs.zoom = 25;
-            inputs.thickness = 25;
-            inputs.aspect = 25;
-            inputs.textSize = 25;
-            inputs.separation = 55;
-            inputs.showLogo = true;
+        reset: function (vals = []) {
+            inputs.zoom = ~~(vals[0]) || 25;
+            inputs.thickness = ~~(vals[1]) || 25;
+            inputs.aspect = ~~(vals[2]) || 25;
+            inputs.textSize = ~~(vals[3]) || 25;
+            inputs.separation = ~~(vals[4]) || 55;
+            inputs.showLogo = vals[5] === undefined ? true : ~~(vals[5]) === true;
         }
-    }
-    ;
+    };
 
-window.onload = function() {
+function updateHash() {
+    window.location.hash = Object
+        .keys(inputs)
+        .filter(key => key != 'reset')
+        .map(key => ~~(inputs[key]))
+        .join(':');
+}
+
+inputs.reset(window.location.hash ? window.location.hash.substr(1).split(':') : []);
+
+window.onload = function () {
+
     const gui = new dat.GUI();
-    gui.add(inputs, 'zoom', 1, 100).listen();
-    gui.add(inputs, 'thickness', 1, 100).listen();
-    gui.add(inputs, 'aspect', 1, 100).listen();
-    gui.add(inputs, 'textSize', 1, 100).listen();
-    gui.add(inputs, 'separation', 1, 100).listen();
-    gui.add(inputs, 'showLogo').onChange(function(showLogo) {
+
+    [ 'zoom', 'thickness', 'aspect', 'textSize', 'separation' ]
+    .forEach(function(key){
+        gui.add(inputs, key, 1, 100)
+            .listen()
+            .onChange(updateHash)
+           ;
+    });
+
+    gui.add(inputs, 'showLogo').onChange(function (showLogo) {
         logo.style.visibility = showLogo ? 'visible' : 'hidden';
+        updateHash();
     }).listen();
+
     gui.add(inputs, 'reset');
 };
 
@@ -71,14 +82,14 @@ function animLoop() {
     window.requestAnimationFrame(animLoop);
 
     let
-      zoom = inputs.zoom * ZOOM_FACTOR,
-      radius = zoom * RATIO_RADIUS,
-      thickness = Math.pow(inputs.thickness, 2) / RATIO_THICKNESS * zoom / RATIO_THICKNESS,
-      aspect = inputs.aspect / RATIO_ASPECT,
-      separation = (inputs.separation - 50) / RATIO_SEPARATION,
-      centerX = canvas.width / 2,
-      centerY = canvas.height / 2
-    ;
+        zoom = inputs.zoom * ZOOM_FACTOR,
+        radius = zoom * RATIO_RADIUS,
+        thickness = Math.pow(inputs.thickness, 2) / RATIO_THICKNESS * zoom / RATIO_THICKNESS,
+        aspect = inputs.aspect / RATIO_ASPECT,
+        separation = (inputs.separation - 50) / RATIO_SEPARATION,
+        centerX = canvas.width / 2,
+        centerY = canvas.height / 2
+        ;
 
     logo.style.height = `${radius * inputs.textSize / RATIO_LOGO_SIZE}px`;
     logo.style.top = `${(window.innerHeight - parseInt(logo.height)) / 2}px`;
@@ -88,50 +99,50 @@ function animLoop() {
 
     vertices.forEach(v => {
 
-      const
-        offsetY = radius * separation * v.os,
+        const
+            offsetY = radius * separation * v.os,
 
-        x1 = centerX + Math.sin(DEG_60 * v.from) * zoom * aspect,
-        y1 = centerY + Math.cos(DEG_60 * v.from) * zoom + offsetY,
-        x2 = centerX + Math.sin(DEG_60 * v.to) * zoom * aspect,
-        y2 = centerY + Math.cos(DEG_60 * v.to) * zoom + offsetY,
+            x1 = centerX + Math.sin(DEG_60 * v.from) * zoom * aspect,
+            y1 = centerY + Math.cos(DEG_60 * v.from) * zoom + offsetY,
+            x2 = centerX + Math.sin(DEG_60 * v.to) * zoom * aspect,
+            y2 = centerY + Math.cos(DEG_60 * v.to) * zoom + offsetY,
 
-        theta = Math.atan((x2 - x1) / (y2 - y1)),
+            theta = Math.atan((x2 - x1) / (y2 - y1)),
 
-        tx1 = Math.sin(theta + DEG_90) * thickness,
-        ty1 = Math.cos(theta + DEG_90) * thickness,
-        tx2 = Math.sin(theta - DEG_90) * thickness,
-        ty2 = Math.cos(theta - DEG_90) * thickness,
+            tx1 = Math.sin(theta + DEG_90) * thickness,
+            ty1 = Math.cos(theta + DEG_90) * thickness,
+            tx2 = Math.sin(theta - DEG_90) * thickness,
+            ty2 = Math.cos(theta - DEG_90) * thickness,
 
-        colorStop0 = hue + v.c * COLOR_RANGE,
-        colorStop1 = hue + v.c * COLOR_RANGE + COLOR_RANGE,
+            colorStop0 = hue + v.c * COLOR_RANGE,
+            colorStop1 = hue + v.c * COLOR_RANGE + COLOR_RANGE,
 
-        gradient = ctx.createLinearGradient(x1, y1, x2, y2)
-      ;
+            gradient = ctx.createLinearGradient(x1, y1, x2, y2)
+            ;
 
-      gradient.addColorStop(0, `hsla(${colorStop0}, 100%, 50%, 1)`);
-      gradient.addColorStop(1, `hsla(${colorStop1}, 100%, 50%, 1)`);
-      ctx.fillStyle = gradient;
+        gradient.addColorStop(0, `hsla(${colorStop0}, 100%, 50%, 1)`);
+        gradient.addColorStop(1, `hsla(${colorStop1}, 100%, 50%, 1)`);
+        ctx.fillStyle = gradient;
 
-      ctx.beginPath();
-      ctx.moveTo(x1 + tx1, y1 + ty1);
-      ctx.lineTo(x2 - tx2, y2 - ty2);
-      ctx.lineTo(x2 + tx2, y2 + ty2);
-      ctx.lineTo(x1 - tx1, y1 - ty1);
-      ctx.lineTo(x1 + tx1, y1 + ty1);
-      ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(x1 + tx1, y1 + ty1);
+        ctx.lineTo(x2 - tx2, y2 - ty2);
+        ctx.lineTo(x2 + tx2, y2 + ty2);
+        ctx.lineTo(x1 - tx1, y1 - ty1);
+        ctx.lineTo(x1 + tx1, y1 + ty1);
+        ctx.fill();
 
-      ctx.beginPath();
-      ctx.arc(x2, y2, thickness, 0, DEG_360);
-      ctx.arc(x1, y1, thickness, 0, DEG_360);
-      ctx.fill();
+        ctx.beginPath();
+        ctx.arc(x2, y2, thickness, 0, DEG_360);
+        ctx.arc(x1, y1, thickness, 0, DEG_360);
+        ctx.fill();
 
     });
     hue++;
     hue %= 360;
 }
 
-function resize(){
+function resize() {
     canvas.width = window.innerWidth + CANVAS_BUFFER_SPACE * 2;
     canvas.height = window.innerHeight + CANVAS_BUFFER_SPACE * 2;
     canvas.style.left = `-${CANVAS_BUFFER_SPACE}px`;

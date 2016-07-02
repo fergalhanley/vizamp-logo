@@ -19,6 +19,36 @@
           background-color: transparent;
           position: fixed;
       }
+     .social {
+         position: fixed;
+         top: 0;
+         left: 0;
+         padding: 10px;
+     }
+    .vizamp-button {
+        display: inline-block;
+        height: 18px;
+        padding: 0 5px;
+        line-height: 19px;
+        position: relative;
+        top: -6px;
+        color: #333;
+        vertical-align: middle;
+        cursor: pointer;
+        border: 1px solid #d5d5d5;
+        border-radius: 3px;
+        font-size: 11px;
+        text-shadow: 0 1px 0 rgba(255,255,255,.9);
+        font-weight: 700;
+        text-decoration: none;
+        background-color: #eee;
+        background-image: -webkit-linear-gradient(top,#fcfcfc,#eee);
+        background-image: -moz-linear-gradient(top,#fcfcfc,#eee);
+        background-image: linear-gradient(to bottom,#fcfcfc,#eee);
+        -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr='#fcfcfc', endColorstr='#eeeeee')";
+        font-family: Helvetica,arial,nimbussansl,liberationsans,freesans,clean,sans-serif;
+        -webkit-user-select: none;
+    }
     </style>
 </head>
 <body>
@@ -26,6 +56,13 @@
     <canvas id="cvs"></canvas>
     <img id="logo" src="dist/assets/logo.svg"/>
 </div>
+<div class="social">
+    <a class="github-button" href="https://github.com/fergalhanley/vizamp-logo" data-icon="octicon-star" data-count-href="/fergalhanley/vizamp-logo/stargazers" data-count-api="/repos/fergalhanley/vizamp-logo#stargazers_count" data-count-aria-label="# stargazers on GitHub" aria-label="Star fergalhanley/vizamp-logo on GitHub">Star</a>
+    <a class="github-button" href="https://github.com/fergalhanley" data-count-href="/fergalhanley/followers" data-count-api="/users/fergalhanley#followers" data-count-aria-label="# followers on GitHub" aria-label="Follow @fergalhanley on GitHub">Follow @fergalhanley</a>
+    <a class="vizamp-button" href="http://vizamp.com">Vizamp.com</a>
+    <a class="vizamp-button" href="http://fergalhanley.com">Author Website</a>
+</div>
 <script type="application/javascript" src="dist/index.js"></script>
+<script async defer src="https://buttons.github.io/buttons.js"></script>
 </body>
 </html>

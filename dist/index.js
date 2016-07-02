@@ -1,5 +1,5 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-'use strict';
+"use strict";
 
 var dat = require("dat-gui");
 
@@ -27,32 +27,41 @@ CANVAS_BUFFER_SPACE = 1024,
     ctx = canvas.getContext('2d'),
     vertices = [{ c: 3, from: 3, to: 1, os: 1 }, { c: 2, from: 5, to: 3, os: 1 }, { c: 5, from: 4, to: 0, os: -1 }, { c: 0, from: 0, to: 2, os: -1 }],
     inputs = {
-    zoom: 25,
-    thickness: 25,
-    aspect: 25,
-    textSize: 25,
-    separation: 55,
-    showLogo: true,
     reset: function reset() {
-        inputs.zoom = 25;
-        inputs.thickness = 25;
-        inputs.aspect = 25;
-        inputs.textSize = 25;
-        inputs.separation = 55;
-        inputs.showLogo = true;
+        var vals = arguments.length <= 0 || arguments[0] === undefined ? [] : arguments[0];
+
+        inputs.zoom = ~ ~vals[0] || 25;
+        inputs.thickness = ~ ~vals[1] || 25;
+        inputs.aspect = ~ ~vals[2] || 25;
+        inputs.textSize = ~ ~vals[3] || 25;
+        inputs.separation = ~ ~vals[4] || 55;
+        inputs.showLogo = vals[5] === undefined ? true : ~ ~vals[5] === true;
     }
 };
 
+function updateHash() {
+    window.location.hash = Object.keys(inputs).filter(function (key) {
+        return key != 'reset';
+    }).map(function (key) {
+        return ~ ~inputs[key];
+    }).join(':');
+}
+
+inputs.reset(window.location.hash ? window.location.hash.substr(1).split(':') : []);
+
 window.onload = function () {
+
     var gui = new dat.GUI();
-    gui.add(inputs, 'zoom', 1, 100).listen();
-    gui.add(inputs, 'thickness', 1, 100).listen();
-    gui.add(inputs, 'aspect', 1, 100).listen();
-    gui.add(inputs, 'textSize', 1, 100).listen();
-    gui.add(inputs, 'separation', 1, 100).listen();
+
+    ['zoom', 'thickness', 'aspect', 'textSize', 'separation'].forEach(function (key) {
+        gui.add(inputs, key, 1, 100).listen().onChange(updateHash);
+    });
+
     gui.add(inputs, 'showLogo').onChange(function (showLogo) {
         logo.style.visibility = showLogo ? 'visible' : 'hidden';
+        updateHash();
     }).listen();
+
     gui.add(inputs, 'reset');
 };
 
@@ -70,9 +79,9 @@ function animLoop() {
         centerX = canvas.width / 2,
         centerY = canvas.height / 2;
 
-    logo.style.height = radius * inputs.textSize / RATIO_LOGO_SIZE + 'px';
-    logo.style.top = (window.innerHeight - parseInt(logo.height)) / 2 + 'px';
-    logo.style.left = (window.innerWidth - parseInt(logo.width) * FUDGE_TO_CENTER) / 2 + 'px';
+    logo.style.height = radius * inputs.textSize / RATIO_LOGO_SIZE + "px";
+    logo.style.top = (window.innerHeight - parseInt(logo.height)) / 2 + "px";
+    logo.style.left = (window.innerWidth - parseInt(logo.width) * FUDGE_TO_CENTER) / 2 + "px";
 
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
@@ -92,8 +101,8 @@ function animLoop() {
             colorStop1 = hue + v.c * COLOR_RANGE + COLOR_RANGE,
             gradient = ctx.createLinearGradient(x1, y1, x2, y2);
 
-        gradient.addColorStop(0, 'hsla(' + colorStop0 + ', 100%, 50%, 1)');
-        gradient.addColorStop(1, 'hsla(' + colorStop1 + ', 100%, 50%, 1)');
+        gradient.addColorStop(0, "hsla(" + colorStop0 + ", 100%, 50%, 1)");
+        gradient.addColorStop(1, "hsla(" + colorStop1 + ", 100%, 50%, 1)");
         ctx.fillStyle = gradient;
 
         ctx.beginPath();
@@ -114,11 +123,10 @@ function animLoop() {
 }
 
 function resize() {
-    "use strict";
     canvas.width = window.innerWidth + CANVAS_BUFFER_SPACE * 2;
     canvas.height = window.innerHeight + CANVAS_BUFFER_SPACE * 2;
-    canvas.style.left = '-' + CANVAS_BUFFER_SPACE + 'px';
-    canvas.style.top = '-' + CANVAS_BUFFER_SPACE + 'px';
+    canvas.style.left = "-" + CANVAS_BUFFER_SPACE + "px";
+    canvas.style.top = "-" + CANVAS_BUFFER_SPACE + "px";
 }
 
 window.onresize = resize;
