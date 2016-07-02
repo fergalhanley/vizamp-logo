@@ -1,0 +1,37 @@
+{
+  "name": "@fergalhanley/vizamp-logo",
+  "version": "1.0.0",
+  "description": "Vizamp logo geration tool",
+  "main": "./src/index.js",
+  "watch": {
+    "test": "./src/*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fergalhanley/vizamp-logo.git"
+  },
+  "scripts": {
+    "build": "npm run babel && npm run browserify && npm run clean",
+    "babel": "babel src/index.js --out-file dist/index-es5-temp.js",
+    "browserify": "browserify dist/index-es5-temp.js > dist/index.js",
+    "clean": "del-cli dist/index-es5-temp.js"
+  },
+  "keywords": [
+    "vizamp",
+    "logo"
+  ],
+  "author": "Fergal Hanley <fergalhanley@gmail.com> (http://fergalhanley.com)",
+  "license": "Artistic-2.0",
+  "bugs": {
+    "url": "https://github.com/fergalhanley/vizamp-logo/issues"
+  },
+  "homepage": "https://github.com/fergalhanley/vizamp-logo#readme",
+  "devDependencies": {
+    "babel": "^5.8.23",
+    "browserify": "^13.0.1",
+    "del-cli": "^0.2.0"
+  },
+  "dependencies": {
+    "dat-gui": "^0.5.0"
+  }
+}

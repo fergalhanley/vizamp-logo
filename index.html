@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Vizamp logo tool</title>
+    <style>
+      .app {
+          position: fixed;
+          top: 0;
+          bottom: 0;
+          right: 0;
+          left: 0;
+          background-color: #151515;
+      }
+      .app img {
+          position: fixed;
+      }
+      canvas {
+          background-color: transparent;
+          position: fixed;
+      }
+    </style>
+</head>
+<body>
+<div class="app">
+    <canvas id="cvs"></canvas>
+    <img id="logo" src="dist/assets/logo.svg"/>
+</div>
+<script type="application/javascript" src="dist/index.js"></script>
+</body>
+</html>
