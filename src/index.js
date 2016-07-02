@@ -151,5 +151,9 @@ function resize() {
 
 window.onresize = resize;
 
+setTimeout(function(){
+    $('.social').style.visibility = 'visible';
+}, 1000);
+
 resize();
 animLoop();
