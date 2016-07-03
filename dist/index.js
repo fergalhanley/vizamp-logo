@@ -25,7 +25,7 @@ CANVAS_BUFFER_SPACE = 1024,
     canvas = $('#cvs'),
     logo = $('#logo'),
     ctx = canvas.getContext('2d'),
-    vertices = [{ c: 3, from: 3, to: 1, os: 1 }, { c: 2, from: 5, to: 3, os: 1 }, { c: 5, from: 4, to: 0, os: -1 }, { c: 0, from: 0, to: 2, os: -1 }],
+    vertices = [{ c: 1, from: 2, to: 5, os: 0, hex: 1 }, { c: 4, from: 1, to: 4, os: 0, hex: 1 }, { c: 3, from: 3, to: 1, os: 1, hex: 0 }, { c: 2, from: 5, to: 3, os: 1, hex: 0 }, { c: 5, from: 4, to: 0, os: -1, hex: 0 }, { c: 0, from: 0, to: 2, os: -1, hex: 0 }],
     inputs = {
     reset: function reset() {
         var vals = arguments.length <= 0 || arguments[0] === undefined ? [] : arguments[0];
@@ -35,16 +35,19 @@ CANVAS_BUFFER_SPACE = 1024,
         inputs.aspect = ~ ~vals[2] || 25;
         inputs.textSize = ~ ~vals[3] || 25;
         inputs.separation = ~ ~vals[4] || 55;
-        inputs.showLogo = vals[5] === undefined ? true : ~ ~vals[5] === true;
+        inputs.showText = vals[5] === undefined ? true : ~ ~vals[5] === 1;
+        inputs.unicursal = vals[6] === undefined ? false : ~ ~vals[6] === 1;
+        updateState();
     }
 };
 
-function updateHash() {
+function updateState() {
     window.location.hash = Object.keys(inputs).filter(function (key) {
         return key != 'reset';
     }).map(function (key) {
         return ~ ~inputs[key];
     }).join(':');
+    logo.style.visibility = inputs.showText ? 'visible' : 'hidden';
 }
 
 inputs.reset(window.location.hash ? window.location.hash.substr(1).split(':') : []);
@@ -54,14 +57,10 @@ window.onload = function () {
     var gui = new dat.GUI();
 
     ['zoom', 'thickness', 'aspect', 'textSize', 'separation'].forEach(function (key) {
-        gui.add(inputs, key, 1, 100).listen().onChange(updateHash);
+        gui.add(inputs, key, 1, 100).listen().onChange(updateState);
     });
-
-    gui.add(inputs, 'showLogo').onChange(function (showLogo) {
-        logo.style.visibility = showLogo ? 'visible' : 'hidden';
-        updateHash();
-    }).listen();
-
+    gui.add(inputs, 'unicursal').listen().onChange(updateState);
+    gui.add(inputs, 'showText').listen().onChange(updateState);
     gui.add(inputs, 'reset');
 };
 
@@ -85,9 +84,11 @@ function animLoop() {
 
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
-    vertices.forEach(function (v) {
+    vertices.filter(function (v) {
+        return ~ ~inputs.unicursal >= v.hex;
+    }).forEach(function (v) {
 
-        var offsetY = radius * separation * v.os,
+        var offsetY = inputs.unicursal ? 0 : radius * separation * v.os,
             x1 = centerX + Math.sin(DEG_60 * v.from) * zoom * aspect,
             y1 = centerY + Math.cos(DEG_60 * v.from) * zoom + offsetY,
             x2 = centerX + Math.sin(DEG_60 * v.to) * zoom * aspect,
