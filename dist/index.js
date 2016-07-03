@@ -25,7 +25,7 @@ CANVAS_BUFFER_SPACE = 1024,
     canvas = $('#cvs'),
     logo = $('#logo'),
     ctx = canvas.getContext('2d'),
-    vertices = [{ c: 1, from: 2, to: 5, os: 0, hex: 1 }, { c: 4, from: 1, to: 4, os: 0, hex: 1 }, { c: 3, from: 3, to: 1, os: 1, hex: 0 }, { c: 2, from: 5, to: 3, os: 1, hex: 0 }, { c: 5, from: 4, to: 0, os: -1, hex: 0 }, { c: 0, from: 0, to: 2, os: -1, hex: 0 }],
+    edges = [{ c: 1, from: 2, to: 5, yos: 0, hex: 1 }, { c: 4, from: 1, to: 4, yos: 0, hex: 1 }, { c: 3, from: 3, to: 1, yos: 1, hex: 0 }, { c: 2, from: 5, to: 3, yos: 1, hex: 0 }, { c: 5, from: 4, to: 0, yos: -1, hex: 0 }, { c: 0, from: 0, to: 2, yos: -1, hex: 0 }],
     inputs = {
     reset: function reset() {
         var vals = arguments.length <= 0 || arguments[0] === undefined ? [] : arguments[0];
@@ -84,11 +84,11 @@ function animLoop() {
 
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
-    vertices.filter(function (v) {
+    edges.filter(function (v) {
         return ~ ~inputs.unicursal >= v.hex;
     }).forEach(function (v) {
 
-        var offsetY = inputs.unicursal ? 0 : radius * separation * v.os,
+        var offsetY = inputs.unicursal ? 0 : radius * separation * v.yos,
             x1 = centerX + Math.sin(DEG_60 * v.from) * zoom * aspect,
             y1 = centerY + Math.cos(DEG_60 * v.from) * zoom + offsetY,
             x2 = centerX + Math.sin(DEG_60 * v.to) * zoom * aspect,

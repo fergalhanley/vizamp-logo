@@ -27,13 +27,13 @@ const
     logo = $('#logo'),
     ctx = canvas.getContext('2d'),
 
-    vertices = [
-        {c: 1, from: 2, to: 5, yos: 0, hex: 1 },
-        {c: 4, from: 1, to: 4, yos: 0, hex: 1 },
-        {c: 3, from: 3, to: 1, yos: 1, hex: 0 },
-        {c: 2, from: 5, to: 3, yos: 1, hex: 0 },
-        {c: 5, from: 4, to: 0, yos: -1, hex: 0 },
-        {c: 0, from: 0, to: 2, yos: -1, hex: 0 },
+    edges = [
+        {c: 1, from: 2, to: 5, yos: 0, hex: 1},
+        {c: 4, from: 1, to: 4, yos: 0, hex: 1},
+        {c: 3, from: 3, to: 1, yos: 1, hex: 0},
+        {c: 2, from: 5, to: 3, yos: 1, hex: 0},
+        {c: 5, from: 4, to: 0, yos: -1, hex: 0},
+        {c: 0, from: 0, to: 2, yos: -1, hex: 0},
     ],
 
     inputs = {
@@ -64,12 +64,12 @@ window.onload = function () {
 
     const gui = new dat.GUI();
 
-    [ 'zoom', 'thickness', 'aspect', 'textSize', 'separation' ]
-    .forEach(function(key){
-        gui.add(inputs, key, 1, 100)
-            .listen()
-            .onChange(updateState);
-    });
+    ['zoom', 'thickness', 'aspect', 'textSize', 'separation']
+        .forEach(function (key) {
+            gui.add(inputs, key, 1, 100)
+                .listen()
+                .onChange(updateState);
+        });
     gui.add(inputs, 'unicursal').listen().onChange(updateState);
     gui.add(inputs, 'showText').listen().onChange(updateState);
     gui.add(inputs, 'reset');
@@ -97,7 +97,7 @@ function animLoop() {
 
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
-    vertices.filter( v => ~~(inputs.unicursal) >= v.hex ).forEach(v => {
+    edges.filter(v => ~~(inputs.unicursal) >= v.hex).forEach(v => {
 
         const
             offsetY = inputs.unicursal ? 0 : radius * separation * v.yos,
@@ -151,7 +151,7 @@ function resize() {
 
 window.onresize = resize;
 
-setTimeout(function(){
+setTimeout(function () {
     $('.social').style.visibility = 'visible';
 }, 1000);
 
