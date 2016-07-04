@@ -45,6 +45,8 @@ const
             inputs.separation = ~~(vals[4]) || 55;
             inputs.showText = vals[5] === undefined ? true : ~~(vals[5]) === 1;
             inputs.unicursal = vals[6] === undefined ? false : ~~(vals[6]) === 1;
+            inputs.showV = vals[7] === undefined ? true : ~~(vals[7]) === 1;
+            inputs.showA = vals[8] === undefined ? true : ~~(vals[8]) === 1;
             updateState();
         }
     };
@@ -70,8 +72,12 @@ window.onload = function () {
                 .listen()
                 .onChange(updateState);
         });
-    gui.add(inputs, 'unicursal').listen().onChange(updateState);
-    gui.add(inputs, 'showText').listen().onChange(updateState);
+    ['unicursal', 'showText', 'showV', 'showA']
+        .forEach(function (key) {
+            gui.add(inputs, key)
+                .listen()
+                .onChange(updateState);
+        });
     gui.add(inputs, 'reset');
 };
 
@@ -97,47 +103,51 @@ function animLoop() {
 
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
-    edges.filter(v => ~~(inputs.unicursal) >= v.hex).forEach(v => {
+    edges
+        .filter(v => ~~(inputs.unicursal) >= v.hex)
+        .filter(v => (v.c === 3 || v.c === 2) ? inputs.showA : true)
+        .filter(v => (v.c === 5 || v.c === 0) ? inputs.showV : true)
+        .forEach(v => {
 
-        const
-            offsetY = inputs.unicursal ? 0 : radius * separation * v.yos,
+            const
+                offsetY = inputs.unicursal ? 0 : radius * separation * v.yos,
 
-            x1 = centerX + Math.sin(DEG_60 * v.from) * zoom * aspect,
-            y1 = centerY + Math.cos(DEG_60 * v.from) * zoom + offsetY,
-            x2 = centerX + Math.sin(DEG_60 * v.to) * zoom * aspect,
-            y2 = centerY + Math.cos(DEG_60 * v.to) * zoom + offsetY,
+                x1 = centerX + Math.sin(DEG_60 * v.from) * zoom * aspect,
+                y1 = centerY + Math.cos(DEG_60 * v.from) * zoom + offsetY,
+                x2 = centerX + Math.sin(DEG_60 * v.to) * zoom * aspect,
+                y2 = centerY + Math.cos(DEG_60 * v.to) * zoom + offsetY,
 
-            theta = Math.atan((x2 - x1) / (y2 - y1)),
+                theta = Math.atan((x2 - x1) / (y2 - y1)),
 
-            tx1 = Math.sin(theta + DEG_90) * thickness,
-            ty1 = Math.cos(theta + DEG_90) * thickness,
-            tx2 = Math.sin(theta - DEG_90) * thickness,
-            ty2 = Math.cos(theta - DEG_90) * thickness,
+                tx1 = Math.sin(theta + DEG_90) * thickness,
+                ty1 = Math.cos(theta + DEG_90) * thickness,
+                tx2 = Math.sin(theta - DEG_90) * thickness,
+                ty2 = Math.cos(theta - DEG_90) * thickness,
 
-            colorStop0 = hue + v.c * COLOR_RANGE,
-            colorStop1 = hue + v.c * COLOR_RANGE + COLOR_RANGE,
+                colorStop0 = hue + v.c * COLOR_RANGE,
+                colorStop1 = hue + v.c * COLOR_RANGE + COLOR_RANGE,
 
-            gradient = ctx.createLinearGradient(x1, y1, x2, y2)
-            ;
+                gradient = ctx.createLinearGradient(x1, y1, x2, y2)
+                ;
 
-        gradient.addColorStop(0, `hsla(${colorStop0}, 100%, 50%, 1)`);
-        gradient.addColorStop(1, `hsla(${colorStop1}, 100%, 50%, 1)`);
-        ctx.fillStyle = gradient;
+            gradient.addColorStop(0, `hsla(${colorStop0}, 100%, 50%, 1)`);
+            gradient.addColorStop(1, `hsla(${colorStop1}, 100%, 50%, 1)`);
+            ctx.fillStyle = gradient;
 
-        ctx.beginPath();
-        ctx.moveTo(x1 + tx1, y1 + ty1);
-        ctx.lineTo(x2 - tx2, y2 - ty2);
-        ctx.lineTo(x2 + tx2, y2 + ty2);
-        ctx.lineTo(x1 - tx1, y1 - ty1);
-        ctx.lineTo(x1 + tx1, y1 + ty1);
-        ctx.fill();
+            ctx.beginPath();
+            ctx.moveTo(x1 + tx1, y1 + ty1);
+            ctx.lineTo(x2 - tx2, y2 - ty2);
+            ctx.lineTo(x2 + tx2, y2 + ty2);
+            ctx.lineTo(x1 - tx1, y1 - ty1);
+            ctx.lineTo(x1 + tx1, y1 + ty1);
+            ctx.fill();
 
-        ctx.beginPath();
-        ctx.arc(x2, y2, thickness, 0, DEG_360);
-        ctx.arc(x1, y1, thickness, 0, DEG_360);
-        ctx.fill();
+            ctx.beginPath();
+            ctx.arc(x2, y2, thickness, 0, DEG_360);
+            ctx.arc(x1, y1, thickness, 0, DEG_360);
+            ctx.fill();
 
-    });
+        });
     hue++;
     hue %= 360;
 }

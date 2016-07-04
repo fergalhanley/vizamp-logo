@@ -37,6 +37,8 @@ CANVAS_BUFFER_SPACE = 1024,
         inputs.separation = ~ ~vals[4] || 55;
         inputs.showText = vals[5] === undefined ? true : ~ ~vals[5] === 1;
         inputs.unicursal = vals[6] === undefined ? false : ~ ~vals[6] === 1;
+        inputs.showV = vals[7] === undefined ? true : ~ ~vals[7] === 1;
+        inputs.showA = vals[8] === undefined ? true : ~ ~vals[8] === 1;
         updateState();
     }
 };
@@ -59,8 +61,9 @@ window.onload = function () {
     ['zoom', 'thickness', 'aspect', 'textSize', 'separation'].forEach(function (key) {
         gui.add(inputs, key, 1, 100).listen().onChange(updateState);
     });
-    gui.add(inputs, 'unicursal').listen().onChange(updateState);
-    gui.add(inputs, 'showText').listen().onChange(updateState);
+    ['unicursal', 'showText', 'showV', 'showA'].forEach(function (key) {
+        gui.add(inputs, key).listen().onChange(updateState);
+    });
     gui.add(inputs, 'reset');
 };
 
@@ -86,6 +89,10 @@ function animLoop() {
 
     edges.filter(function (v) {
         return ~ ~inputs.unicursal >= v.hex;
+    }).filter(function (v) {
+        return v.c === 3 || v.c === 2 ? inputs.showA : true;
+    }).filter(function (v) {
+        return v.c === 5 || v.c === 0 ? inputs.showV : true;
     }).forEach(function (v) {
 
         var offsetY = inputs.unicursal ? 0 : radius * separation * v.yos,
